@@ -7,6 +7,6 @@ require("../styles/application.scss");
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App.jsx';
-import Messages from './Messages.jsx'
+import Message from './Message.jsx'
 
 ReactDOM.render(<App />, document.getElementById('react-root'));

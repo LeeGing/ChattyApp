@@ -1,6 +1,13 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700");
 @import url("https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css");
 
+
+.loading {
+  padding-left: 15px;
+  font-size: 12px;
+  font-color: black;
+}
+
 body {
   background: white;
   color: black;
