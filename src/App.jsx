@@ -28,8 +28,20 @@ class App extends Component {
   }
 
   componentDidMount() {
-   console.log("componentDidMount <App />");
-   setTimeout(() => {
+    this.socket = new WebSocket('ws://localhost:3001');
+    // this.socket.addEventListener('open', () => {
+    //   this.socket.send('it works');
+    // });
+    this.socket.addEventListener('message', (event) => {
+      // console.log('Got a message');
+      // console.log(event.data);
+      const newMessages = this.state.messages;
+      const messageObject = JSON.parse(event.data);
+      newMessages.push(messageObject);
+      this.setState({messages: newMessages});
+    });
+    console.log("componentDidMount <App />");
+    setTimeout(() => {
      console.log("Simulating incoming message");
      // Add a new message to the list of messages in the data store
      const newMessage = {id: 3, username: "Michelle", content: "Hello there!"};
@@ -46,10 +58,7 @@ class App extends Component {
      username: this.state.currentUser,
      content: text
    }
-   const messagePlusNewMessage = this.state.messages.concat([newMessage]);
-
-   this.setState({messages: messagePlusNewMessage});
-   this.index += 1;
+    this.socket.send(JSON.stringify(newMessage));
   }
 
   render() {
