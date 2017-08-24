@@ -55,7 +55,6 @@ class App extends Component {
     this.socket = new WebSocket('ws://localhost:3001')
     
     this.socket.addEventListener('message', (event) => {
-      console.log(event.data);
       const newMessages = this.state.messages;
       const messageObject = JSON.parse(event.data);
 
@@ -67,17 +66,17 @@ class App extends Component {
           newMessages.push({content: this.state.oldName + " has changed their username to " + messageObject.username});
           this.setState({messages: newMessages});
           console.log(event.data);
-
+      } else if (messageObject.type === "count"){ // If emitting, I think it's receving it. How do we access to chatbar?
+        this.setState({userCount: messageObject.userCount});
       }
 
-      this.setState({messages: newMessages});
     });
   }
 
   render() {
     return (
       <div>
-          <NavBar/>
+          <NavBar usercount={this.state.userCount}/>
           <MessageList messages={ this.state.messages}/>
           <ChatBar sendMessage={text => this.sendMessage(text)} changeUsername={text => this.changeUsername(text)}/>
       </div>
