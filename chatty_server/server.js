@@ -24,36 +24,46 @@ wss.broadcast = function broadcast(data) {
   });
 };
 
+function updateUserCount() {
+  const userCount = { type: "count", userCount:wss.clients.size};
+  wss.broadcast(JSON.stringify(userCount));
+};
+
 wss.on('connection', (ws) => {
   console.log('Client connected');
+  updateUserCount();
 
   ws.on('message', (message) => {
     console.log('Got a message!');
     const receivedMessage = JSON.parse(message);
 
     if(receivedMessage.type === 'postMessage') {
-    console.log(message);
-	  const newReceivedMessage = {
-      type:'incomingMessage',
-	  	id: uuidv1(),
-	  	username: receivedMessage.username,
-	  	content: receivedMessage.content
-	  }
+      console.log(message);
+  	  const newReceivedMessage = {
+        type:'incomingMessage',
+    	  id: uuidv1(),
+    	  username: receivedMessage.username,
+    	  content: receivedMessage.content
+      }
 	  console.log (newReceivedMessage);
 	  wss.broadcast(JSON.stringify(newReceivedMessage));
-  } else if (receivedMessage.type === 'postNotification'){
-    console.log('CHANGED USERNAME');
-    const newReceivedMessage ={
-      type: 'incomingNotification',
-      id: uuidv1(),
-      username: receivedMessage.username,
-      content: receivedMessage.content
-    }
+    } else if (receivedMessage.type === 'postNotification'){
+      console.log('CHANGED USERNAME');
+      const newReceivedMessage ={
+        type: 'incomingNotification',
+        id: uuidv1(),
+        username: receivedMessage.username,
+        content: receivedMessage.content
+      }
     wss.broadcast(JSON.stringify(newReceivedMessage));
 	  // console.log("UUID: "  + receivedMessageUUID + "User: " + receivedMessage.username + " " + "said " +receivedMessage.content);
-  }
- });
+    }
+   });
 
   // Set up a callback for when a client closes the socket. This usually means they closed their browser.
-  ws.on('close', () => console.log('Client disconnected'));
+  ws.on('close', () => {
+    console.log('Client disconnected')
+    updateUserCount();
+  });
+
 });
