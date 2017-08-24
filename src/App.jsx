@@ -22,9 +22,33 @@ class App extends Component {
       super();
       this.state = {
         currentUser: ChattyData.currentUser.name,
-        messages: ChattyData.messages
+        messages: ChattyData.messages,
+        oldName:null
       }
       this.index = 4;
+  }
+
+  sendMessage(text){
+   const newMessage = {
+    type: "postMessage",
+    id: this.index, //We don't have this.index anymore. But I believe that an empty array can be good.
+    username: this.state.currentUser,
+    content: text
+   }
+    this.socket.send(JSON.stringify(newMessage), 'message');
+  }
+
+  changeUsername(newUsername){
+    this.setState({oldName: this.state.currentUser});
+    this.setState({currentUser: newUsername});
+    const newUser = {
+      type: "postNotification",
+      id: this.index,
+      username: newUsername,
+      content: this.state.content
+   }
+    this.socket.send(JSON.stringify(newUser), 'message');
+   //TO DO : Send a system message saying that the user changed their name.
   }
 
   componentDidMount() {
@@ -32,26 +56,22 @@ class App extends Component {
     
     this.socket.addEventListener('message', (event) => {
       console.log(event.data);
-
       const newMessages = this.state.messages;
       const messageObject = JSON.parse(event.data);
-      newMessages.push(messageObject);
+
+      if(messageObject.type === "incomingMessage"){
+           newMessages.push(messageObject);
+           this.setState({messages: newMessages});
+           console.log(event.data);
+      } else if (messageObject.type === "incomingNotification") {
+          newMessages.push({content: this.state.oldName + " has changed their username to " + messageObject.username});
+          this.setState({messages: newMessages});
+          console.log(event.data);
+
+      }
+
       this.setState({messages: newMessages});
     });
-  }
-
-  sendMessage(text){
-   const newMessage = {
-     id: this.index,
-     username: this.state.currentUser,
-     content: text
-   }
-    this.socket.send(JSON.stringify(newMessage));
-  }
-
-  changeUsername(newUsername){
-   this.setState({currentUser: newUsername});
-   //TO DO : Send a system message saying that the user changed their name.
   }
 
   render() {
