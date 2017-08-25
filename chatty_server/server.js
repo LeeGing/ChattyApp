@@ -35,29 +35,18 @@ wss.on('connection', (ws) => {
   updateUserCount();
 
   ws.on('message', (message) => {
-    console.log('Got a message!');
     const receivedMessage = JSON.parse(message);
-
-    if(receivedMessage.type === 'postMessage') {
-      console.log("Message Text", message);
-      const newReceivedMessage = {
-        type:'incomingMessage',
-        id: uuidv1(),
-        username: receivedMessage.username,
-        content: receivedMessage.content
-      };
-    console.log (newReceivedMessage);
-    wss.broadcast(JSON.stringify(newReceivedMessage));
-    } else if (receivedMessage.type === 'postNotification'){
-      const newReceivedMessage ={
-        type: 'incomingNotification',
-        id: uuidv1(),
-        username: receivedMessage.username,
-        content: receivedMessage.content
-      };
-    wss.broadcast(JSON.stringify(newReceivedMessage));
-    // console.log("UUID: "  + receivedMessageUUID + "User: " + receivedMessage.username + " " + "said " +receivedMessage.content);
+    const newReceivedMessage = {
+      id: uuidv1(),
+      content: receivedMessage.content
     };
+    if(receivedMessage.type === 'postMessage') {
+      newReceivedMessage.type = 'incomingMessage';
+      newReceivedMessage.username = receivedMessage.username;
+    } else if (receivedMessage.type === 'postNotification'){
+      newReceivedMessage.type = 'incomingNotification';
+    }
+    wss.broadcast(JSON.stringify(newReceivedMessage));
    });
 
   // Set up a callback for when a client closes the socket. This usually means they closed their browser.
@@ -65,5 +54,4 @@ wss.on('connection', (ws) => {
     console.log('Client disconnected')
     updateUserCount();
   });
-
 });

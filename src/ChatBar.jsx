@@ -6,6 +6,7 @@ class ChatBar extends Component {
    console.log(e.keyCode);
    if(e.keyCode === 13 /* if the key is enter */){
      this.props.sendMessage(e.target.value);
+     e.target.value = "";
    }
   };
   onMessageKeyPressUser(e){

@@ -15,57 +15,46 @@ class App extends Component {
     this.state = {
       currentUser: 'Anonymous',
       messages: [],
-      oldName: null
     };
   };
 
   sendMessage(text){
     const newMessage = {
       type: "postMessage",
-      id: this.index, 
       username: this.state.currentUser,
       content: text
     };
-    this.socket.send(JSON.stringify(newMessage), 'message');
+    this.socket.send(JSON.stringify(newMessage));
   };
 
   changeUsername(newUsername){
-    this.setState({oldName: this.state.currentUser});
     this.setState({currentUser: newUsername});
     const newUser = {
       type: "postNotification",
-      id: this.index,
-      username: newUsername,
-      content: this.state.content
+      content: this.state.currentUser + " changed their name to " + newUsername
    }
-    this.socket.send(JSON.stringify(newUser), 'message');
+    this.socket.send(JSON.stringify(newUser));
   };
 
   componentDidMount() {
     this.socket = new WebSocket('ws://localhost:3001')
-    this.socket.addEventListener('message', (event) => {
+    this.socket.onmessage = (event) => {
       const newMessages = this.state.messages;
       const messageObject = JSON.parse(event.data);
-
-      //Detemines how the messages are rendered depending on type. 
-      if(messageObject.type === "incomingMessage"){
-           newMessages.push(messageObject);
-           this.setState({messages: newMessages});
-      } else if (messageObject.type === "incomingNotification") {
-        if (this.state.oldName === null) {
-          newMessages.push({
-            id: messageObject.id, 
-            content: "Anonymous has changed their username to " + messageObject.username, 
-            type: 'notification'
-          });
-        } else {
-          newMessages.push({id: messageObject.id, content: this.state.oldName + " has changed their username to " + messageObject.username, type: 'notification'});
-        };
+      console.log(event);
+      switch (messageObject.type) {
+        case "incomingMessage":
+        case "incomingNotification":
+          newMessages.push(messageObject);
           this.setState({messages: newMessages});
-      } else if (messageObject.type === "count"){
-        this.setState({userCount: messageObject.userCount});
-      };
-    });
+          break;
+        case "count":
+          this.setState({userCount: messageObject.userCount});
+          break;
+        default:
+          break;
+      }
+    }
   };
 
   render() {
