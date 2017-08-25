@@ -5,7 +5,7 @@ ChattyApp is a web application built with Node and React that allows the users t
 
 ## Final Product
 
-["Screenshot of ChattyApp"] (<img src="http://i.imgur.com/GpDizbN.png" alt="Home page" style="max-width:100%;"></a>
+["Screenshot of ChattyApp"] <img src="http://i.imgur.com/GpDizbN.png" alt="Home page" style="max-width:100%;"></a>
 
 
 ## Dependencies
