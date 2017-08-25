@@ -24,6 +24,7 @@ wss.broadcast = function broadcast(data) {
   });
 };
 
+//Updates the counter for users online.
 function updateUserCount() {
   const userCount = { type: "count", userCount:wss.clients.size};
   wss.broadcast(JSON.stringify(userCount));
@@ -44,20 +45,19 @@ wss.on('connection', (ws) => {
     	  id: uuidv1(),
     	  username: receivedMessage.username,
     	  content: receivedMessage.content
-      }
+      };
 	  console.log (newReceivedMessage);
 	  wss.broadcast(JSON.stringify(newReceivedMessage));
     } else if (receivedMessage.type === 'postNotification'){
-      console.log('CHANGED USERNAME');
       const newReceivedMessage ={
         type: 'incomingNotification',
         id: uuidv1(),
         username: receivedMessage.username,
         content: receivedMessage.content
-      }
+      };
     wss.broadcast(JSON.stringify(newReceivedMessage));
 	  // console.log("UUID: "  + receivedMessageUUID + "User: " + receivedMessage.username + " " + "said " +receivedMessage.content);
-    }
+    };
    });
 
   // Set up a callback for when a client closes the socket. This usually means they closed their browser.

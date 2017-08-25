@@ -4,39 +4,30 @@ import ChatBar from './ChatBar.jsx'
 import NavBar from './NavBar.jsx'
 
 const ChattyData = {
-  currentUser: {name: "Bob"}, // optional. if currentUser is not defined, it means the user is Anonymous
-  messages: [
-    { id: "1",
-      username: "Bob",
-      content: "Has anyone seen my marbles?",
-    },
-    { id: "2",
-      username: "Anonymous",
-      content: "No, I think you lost them. You lost your marbles Bob. You lost them for good."
-    }
-  ]
-}
+  // optional. if currentUser is not defined, it means the user is Anonymous
+  currentUser: {name: "Anonymous"}, 
+  messages: []
+};
 
 class App extends Component {
   constructor() {
       super();
       this.state = {
-        currentUser: ChattyData.currentUser.name,
-        messages: ChattyData.messages,
+        currentUser: 'Anonymous',
+        messages: [],
         oldName:null
       }
-      this.index = 4;
-  }
+  };
 
   sendMessage(text){
    const newMessage = {
     type: "postMessage",
-    id: this.index, //We don't have this.index anymore. But I believe that an empty array can be good.
+    id: this.index, 
     username: this.state.currentUser,
     content: text
-   }
+   };
     this.socket.send(JSON.stringify(newMessage), 'message');
-  }
+  };
 
   changeUsername(newUsername){
     this.setState({oldName: this.state.currentUser});
@@ -48,40 +39,42 @@ class App extends Component {
       content: this.state.content
    }
     this.socket.send(JSON.stringify(newUser), 'message');
-   //TO DO : Send a system message saying that the user changed their name.
-  }
+  };
 
   componentDidMount() {
     this.socket = new WebSocket('ws://localhost:3001')
-    
     this.socket.addEventListener('message', (event) => {
       const newMessages = this.state.messages;
       const messageObject = JSON.parse(event.data);
 
+      //Detemines how the messages are rendered depending on type. 
       if(messageObject.type === "incomingMessage"){
            newMessages.push(messageObject);
            this.setState({messages: newMessages});
-           console.log(event.data);
       } else if (messageObject.type === "incomingNotification") {
-          newMessages.push({content: this.state.oldName + " has changed their username to " + messageObject.username});
+        if (this.state.oldName === null) {
+          newMessages.push({id: messageObject.id, content: "Anonymous has changed their username to " + messageObject.username, type: 'notification'});
           this.setState({messages: newMessages});
-          console.log(event.data);
-      } else if (messageObject.type === "count"){ // If emitting, I think it's receving it. How do we access to chatbar?
+        } else {
+          newMessages.push({id: messageObject.id, content: this.state.oldName + " has changed their username to " + messageObject.username, type: 'notification'});
+          this.setState({messages: newMessages});
+        };
+          this.setState({messages: newMessages});
+      } else if (messageObject.type === "count"){
         this.setState({userCount: messageObject.userCount});
-      }
-
+      };
     });
-  }
+  };
 
   render() {
     return (
       <div>
-          <NavBar usercount={this.state.userCount}/>
+          <NavBar userCount={this.state.userCount}/>
           <MessageList messages={ this.state.messages}/>
           <ChatBar sendMessage={text => this.sendMessage(text)} changeUsername={text => this.changeUsername(text)}/>
       </div>
     );
-  }
-}
+  };
+};
 
 export default App;
