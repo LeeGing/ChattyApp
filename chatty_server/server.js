@@ -26,7 +26,7 @@ wss.broadcast = function broadcast(data) {
 
 //Updates the counter for users online.
 function updateUserCount() {
-  const userCount = { type: "count", userCount:wss.clients.size};
+  const userCount = { type: "count", userCount: wss.clients.size};
   wss.broadcast(JSON.stringify(userCount));
 };
 
@@ -39,15 +39,15 @@ wss.on('connection', (ws) => {
     const receivedMessage = JSON.parse(message);
 
     if(receivedMessage.type === 'postMessage') {
-      console.log(message);
-  	  const newReceivedMessage = {
+      console.log("Message Text", message);
+      const newReceivedMessage = {
         type:'incomingMessage',
-    	  id: uuidv1(),
-    	  username: receivedMessage.username,
-    	  content: receivedMessage.content
+        id: uuidv1(),
+        username: receivedMessage.username,
+        content: receivedMessage.content
       };
-	  console.log (newReceivedMessage);
-	  wss.broadcast(JSON.stringify(newReceivedMessage));
+    console.log (newReceivedMessage);
+    wss.broadcast(JSON.stringify(newReceivedMessage));
     } else if (receivedMessage.type === 'postNotification'){
       const newReceivedMessage ={
         type: 'incomingNotification',
@@ -56,7 +56,7 @@ wss.on('connection', (ws) => {
         content: receivedMessage.content
       };
     wss.broadcast(JSON.stringify(newReceivedMessage));
-	  // console.log("UUID: "  + receivedMessageUUID + "User: " + receivedMessage.username + " " + "said " +receivedMessage.content);
+    // console.log("UUID: "  + receivedMessageUUID + "User: " + receivedMessage.username + " " + "said " +receivedMessage.content);
     };
    });
 

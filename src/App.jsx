@@ -10,22 +10,22 @@ const ChattyData = {
 };
 
 class App extends Component {
-  constructor() {
-      super();
-      this.state = {
-        currentUser: 'Anonymous',
-        messages: [],
-        oldName:null
-      }
+  constructor(props) {
+    super(props);
+    this.state = {
+      currentUser: 'Anonymous',
+      messages: [],
+      oldName: null
+    };
   };
 
   sendMessage(text){
-   const newMessage = {
-    type: "postMessage",
-    id: this.index, 
-    username: this.state.currentUser,
-    content: text
-   };
+    const newMessage = {
+      type: "postMessage",
+      id: this.index, 
+      username: this.state.currentUser,
+      content: text
+    };
     this.socket.send(JSON.stringify(newMessage), 'message');
   };
 
@@ -53,11 +53,13 @@ class App extends Component {
            this.setState({messages: newMessages});
       } else if (messageObject.type === "incomingNotification") {
         if (this.state.oldName === null) {
-          newMessages.push({id: messageObject.id, content: "Anonymous has changed their username to " + messageObject.username, type: 'notification'});
-          this.setState({messages: newMessages});
+          newMessages.push({
+            id: messageObject.id, 
+            content: "Anonymous has changed their username to " + messageObject.username, 
+            type: 'notification'
+          });
         } else {
           newMessages.push({id: messageObject.id, content: this.state.oldName + " has changed their username to " + messageObject.username, type: 'notification'});
-          this.setState({messages: newMessages});
         };
           this.setState({messages: newMessages});
       } else if (messageObject.type === "count"){

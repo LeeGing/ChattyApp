@@ -7,20 +7,19 @@ class MessageList extends Component {
   render() {
     const messages = this.props.messages.map(message =>{
       if (message.type === 'notification') {
-        return <Notification key = {message.id} content = {message.content}/>;
+        return <Notification key={message.id} content = {message.content}/>;
       } else {
         return <Message key = {message.id} username = {message.username} content = {message.content}/>;
       }
     });
 
-
     return (
       <div>
-      	<div>
-      	   {messages}
+        <div>
+           {messages}
         </div>
       </div>
-  	)
+    )
   }
 };
 
